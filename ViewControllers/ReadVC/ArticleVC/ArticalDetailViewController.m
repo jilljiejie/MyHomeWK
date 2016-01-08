@@ -7,13 +7,19 @@
 //
 
 #import "ArticalDetailViewController.h"
-
+#import "DBManager.h"
 @interface ArticalDetailViewController ()
 
 @end
 
 @implementation ArticalDetailViewController
-
+-(void)viewWillAppear:(BOOL)animated{
+    DBManager *manager=[DBManager defaultManager];
+    if ([manager isHasDataIDFromTable:self.model.dataID]) {
+        UIButton *button=[self.view viewWithTag:20];
+        button.selected=YES;
+    }
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self settingNav];
@@ -28,7 +34,29 @@
     [self.view addSubview:webView];
     
     //webView和javascript的交互
+    
+    UIButton *collectionButton=[FactoryUI createButtonWithFrame:CGRectMake(SCREEN_W-80, 80, 50, 50) title:nil titleColor:nil imageName:@"LikeBtn1" backgroundImageName:nil target:self selector:@selector(collectionButtonAction:)];
+    [collectionButton setImage:[UIImage imageNamed:@"LikeBtn"] forState:UIControlStateSelected];
+    collectionButton.tag=20;
+    [self.view addSubview:collectionButton];
+    
 }
+-(void)collectionButtonAction:(UIButton *)button{
+    DBManager *manager=[DBManager defaultManager];
+    if ([manager isHasDataIDFromTable:self.model.dataID]) {
+        //说明已经收藏过,取消收藏
+        [manager deleteNameFromTable:self.model.dataID];
+        button.selected=NO;
+        
+    }
+    else{
+        [manager insertDataModel:self.model];
+        button.selected=YES;
+    }
+
+}
+
+
 -(void)settingNav{
 self.titleLabel.text=@"详情";
     [self.leftButton setImage:[UIImage imageNamed:@"qrcode_scan_titlebar_back_nor@2x"] forState:UIControlStateNormal];
